@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Studio Jogja Dashboard</title>
+  <style>
+    :root {
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --color-text-primary: #111827;
+      --color-text-secondary: #6b7280;
+      --color-text-tertiary: #9ca3af;
+      --color-border-primary: #d1d5db;
+      --color-border-secondary: #d1d5db;
+      --color-border-tertiary: #e5e7eb;
+      --color-background-primary: #ffffff;
+      --color-background-secondary: #f9fafb;
+      --border-radius-md: 10px;
+      --border-radius-lg: 16px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-sans);
+      font-size: 14px;
+      color: var(--color-text-primary);
+      background: #fff;
+      padding: 20px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+
+    nav {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 1.5rem;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    nav button {
+      white-space: nowrap;
+      font-size: 13px;
+      font-family: var(--font-sans);
+      padding: 8px 14px;
+      border-radius: 9999px;
+      border: 0.5px solid var(--color-border-secondary);
+      background: transparent;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      flex: 0 0 auto;
+    }
+
+    nav button.active {
+      background: var(--color-background-secondary);
+      color: var(--color-text-primary);
+      font-weight: 500;
+      border-color: var(--color-border-primary);
+    }
+
+    .page { display: none; }
+    .page.active { display: block; }
+    .section { margin-bottom: 2rem; }
+    .label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+
+    .cards3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+    .card {
+      background: var(--color-background-primary);
+      border: 0.5px solid var(--color-border-tertiary);
+      border-radius: var(--border-radius-lg);
+      padding: 16px;
+      position: relative;
+    }
+
+    .card.featured { border: 2px solid #185FA5; }
+    .card-badge {
+      position: absolute;
+      top: -1px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #185FA5;
+      color: #E6F1FB;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 12px;
+      border-radius: 0 0 8px 8px;
+      white-space: nowrap;
+    }
+
+    .card-title { font-size: 15px; font-weight: 500; margin-bottom: 2px; }
+    .card-sub { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 14px; }
+    .stat { margin-bottom: 8px; }
+    .stat-label { font-size: 11px; color: var(--color-text-secondary); }
+    .stat-val { font-size: 18px; font-weight: 500; }
+    .stat-val.green { color: #0F6E56; }
+    .stat-val.amber { color: #854F0B; }
+    .stat-val.blue { color: #185FA5; }
+
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      margin: 2px 2px 0 0;
+    }
+
+    .tag-green { background: #EAF3DE; color: #3B6D11; }
+    .tag-amber { background: #FAEEDA; color: #854F0B; }
+    .tag-gray { background: #F1EFE8; color: #5F5E5A; }
+    .tag-blue { background: #E6F1FB; color: #185FA5; }
+    .tag-teal { background: #E1F5EE; color: #0F6E56; }
+
+    hr { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 1.5rem 0; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      text-align: left;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      padding: 6px 10px;
+      border-bottom: 0.5px solid var(--color-border-tertiary);
+    }
+
+    td {
+      padding: 9px 10px;
+      border-bottom: 0.5px solid var(--color-border-tertiary);
+      vertical-align: top;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    .row-total td { font-weight: 500; background: var(--color-background-secondary); }
+
+    .note {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      border-left: 2px solid var(--color-border-secondary);
+      padding: 8px 12px;
+      margin-top: 12px;
+      border-radius: 0;
+    }
+
+    .timeline { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 8px; }
+    .tl-step { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px; }
+    .tl-week { font-size: 11px; color: var(--color-text-secondary); font-weight: 500; margin-bottom: 4px; }
+    .tl-title { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+    .tl-items { font-size: 11px; color: var(--color-text-secondary); line-height: 1.6; }
+
+    .flow { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 12px 0; }
+    .flow-box { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 8px 12px; font-size: 12px; font-weight: 500; }
+    .flow-box.accent { background: #E6F1FB; color: #185FA5; }
+    .flow-box.warn { background: #FAEEDA; color: #854F0B; }
+    .flow-arrow { color: var(--color-text-tertiary); font-size: 14px; }
+
+    .metric-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 10px; }
+    .metric { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 14px; }
+    .metric-l { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; }
+    .metric-v { font-size: 20px; font-weight: 500; }
+
+    .slider-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .slider-label { font-size: 13px; color: var(--color-text-secondary); width: 160px; flex-shrink: 0; }
+    .slider-val { font-size: 14px; font-weight: 500; min-width: 72px; text-align: right; }
+
+    .be-row { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: var(--border-radius-md); margin-bottom: 8px; font-size: 13px; }
+    .be-good { background: #E1F5EE; color: #085041; }
+    .be-bad { background: #FCEBEB; color: #501313; }
+    .be-ok { background: #FAEEDA; color: #412402; }
+
+    .td-muted { color: var(--color-text-secondary); font-size: 12px; }
+
+    canvas { max-width: 100%; }
+
+    @media (max-width: 900px) {
+      .cards3 { grid-template-columns: 1fr; }
+      .timeline { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      body { padding: 14px; }
+      .timeline { grid-template-columns: 1fr; }
+      .slider-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .slider-label {
+        width: auto;
+      }
+      .slider-val {
+        text-align: left;
+      }
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h2 class="sr-only">Studio content production dashboard — capacity scenarios, cost calculator, equipment list, production flow, and setup timeline.</h2>
+
+  <nav>
+    <button class="active" onclick="go('overview', this)">Kapasitas</button>
+    <button onclick="go('calc', this)">Kalkulator biaya</button>
+    <button onclick="go('equipment', this)">Equipment</button>
+    <button onclick="go('flow', this)">Alur produksi</button>
+    <button onclick="go('timeline', this)">Timeline setup</button>
+    <button onclick="go('investor', this)">Angka investor</button>
+  </nav>
+
+  <!-- PAGE: OVERVIEW -->
+  <div id="p-overview" class="page active">
+    <div class="section">
+      <div class="label">3 skenario setup kapasitas</div>
+      <div class="cards3">
+        <div class="card">
+          <div class="card-title">Lean</div>
+          <div class="card-sub">3 orang aktif</div>
+          <div class="stat"><div class="stat-label">Kapasitas/bulan</div><div class="stat-val amber">40–60 konten</div></div>
+          <div class="stat"><div class="stat-label">Harian (5 hari kerja)</div><div class="stat-val" style="font-size:14px">2–3 konten/hari</div></div>
+          <div class="stat"><div class="stat-label">Fixed cost/bulan</div><div class="stat-val" style="font-size:14px">~Rp 12 jt</div></div>
+          <div class="stat"><div class="stat-label">Biaya per konten</div><div class="stat-val amber">Rp 200–300rb</div></div>
+          <div style="margin-top:10px"><span class="tag tag-gray">Eka + Adil + Admin</span></div>
+        </div>
+        <div class="card featured">
+          <div class="card-badge">rekomendasi launch</div>
+          <div class="card-title" style="margin-top:10px">Standar</div>
+          <div class="card-sub">5 orang penuh</div>
+          <div class="stat"><div class="stat-label">Kapasitas/bulan</div><div class="stat-val blue">60–100 konten</div></div>
+          <div class="stat"><div class="stat-label">Harian (5 hari kerja)</div><div class="stat-val" style="font-size:14px">3–5 konten/hari</div></div>
+          <div class="stat"><div class="stat-label">Fixed cost/bulan</div><div class="stat-val" style="font-size:14px">~Rp 20 jt</div></div>
+          <div class="stat"><div class="stat-label">Biaya per konten</div><div class="stat-val green">Rp 200–333rb</div></div>
+          <div style="margin-top:10px"><span class="tag tag-blue">Eka · Adil · Asst AM · Admin · Editor</span></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Full capacity</div>
+          <div class="card-sub">7–8 orang, 2 unit HP</div>
+          <div class="stat"><div class="stat-label">Kapasitas/bulan</div><div class="stat-val green">100–150 konten</div></div>
+          <div class="stat"><div class="stat-label">Harian (5 hari kerja)</div><div class="stat-val" style="font-size:14px">5–7 konten/hari</div></div>
+          <div class="stat"><div class="stat-label">Fixed cost/bulan</div><div class="stat-val" style="font-size:14px">~Rp 28 jt</div></div>
+          <div class="stat"><div class="stat-label">Biaya per konten</div><div class="stat-val green">Rp 187–280rb</div></div>
+          <div style="margin-top:10px"><span class="tag tag-green">+2nd videografer · +editor junior</span></div>
+        </div>
+      </div>
+      <p class="note">Angka di atas asumsi konten HP-only, brief sederhana (1–2 scene), revisi sudah approved sebelum take. Konten kompleks (multi-scene, banyak prop, talent berbeda) bisa memangkas kapasitas 30–40%.</p>
+    </div>
+
+    <hr>
+
+    <div class="section">
+      <div class="label">Perbandingan model biaya SDM</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="card">
+          <div class="card-title">Model 1 — Trial (freelance)</div>
+          <div class="card-sub" style="margin-bottom:10px">Pakai gadget sendiri dulu</div>
+          <table>
+            <tr><td>Eka (AM/Producer)</td><td style="text-align:right;font-weight:500">Rp 2.200.000</td></tr>
+            <tr><td>Adil (Videografer)</td><td style="text-align:right;font-weight:500">Rp 3.000.000</td></tr>
+            <tr><td>Ruang kerja</td><td style="text-align:right;font-weight:500">Rp 2.000.000</td></tr>
+            <tr><td>Talent + alat</td><td style="text-align:right;color:var(--color-text-secondary)">variabel</td></tr>
+            <tr class="row-total"><td>Total fixed</td><td style="text-align:right">~Rp 7.200.000</td></tr>
+          </table>
+          <p class="note" style="margin-top:10px">Mode ini cocok untuk test 1–2 project pertama.</p>
+        </div>
+        <div class="card featured">
+          <div class="card-badge">setelah project terbukti</div>
+          <div class="card-title" style="margin-top:10px">Model 2 — Full hire</div>
+          <div class="card-sub" style="margin-bottom:10px">5 orang penuh, gaji tetap</div>
+          <table>
+            <tr><td>Eka — AM/Producer</td><td style="text-align:right;font-weight:500">Rp 5.000.000+</td></tr>
+            <tr><td>Adil — Videografer</td><td style="text-align:right;font-weight:500">Rp 3.500.000</td></tr>
+            <tr><td>Asst AM / PM</td><td style="text-align:right;font-weight:500">Rp 3.000.000</td></tr>
+            <tr><td>Admin / Payment</td><td style="text-align:right;font-weight:500">Rp 2.500.000</td></tr>
+            <tr><td>Editor</td><td style="text-align:right;font-weight:500">Rp 3.000.000</td></tr>
+            <tr><td>Ruang + utilitas</td><td style="text-align:right;font-weight:500">Rp 3.000.000</td></tr>
+            <tr class="row-total"><td>Total fixed</td><td style="text-align:right">~Rp 20.000.000</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: CALC -->
+  <div id="p-calc" class="page">
+    <div class="section">
+      <div class="label">Simulasi biaya per konten</div>
+      <div class="slider-row">
+        <span class="slider-label">Model SDM</span>
+        <select id="model-sel" style="flex:1;font-family:var(--font-sans);font-size:13px;padding:6px 10px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary)">
+          <option value="7200000">Trial / Freelance (Rp 7,2 jt/bln)</option>
+          <option value="12000000">Lean — 3 orang (Rp 12 jt/bln)</option>
+          <option value="20000000" selected>Standar — 5 orang (Rp 20 jt/bln)</option>
+          <option value="28000000">Full capacity — 7-8 orang (Rp 28 jt/bln)</option>
+        </select>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">Konten per bulan</span>
+        <input type="range" min="10" max="150" value="60" step="5" id="vol" style="flex:1">
+        <span class="slider-val" id="vol-out">60</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">Harga jual per konten (Rp)</span>
+        <input type="range" min="150000" max="600000" value="250000" step="10000" id="price" style="flex:1">
+        <span class="slider-val" id="price-out">Rp 250.000</span>
+      </div>
+      <div id="calc-cards" class="metric-row" style="margin-top:1rem"></div>
+      <div id="calc-verdict" style="margin-top:12px"></div>
+      <div style="position:relative;height:220px;margin-top:1.5rem">
+        <canvas id="calc-chart" role="img" aria-label="Bar chart comparing cost per content vs selling price vs Jakarta benchmark"></canvas>
+      </div>
+      <p class="note">Fixed cost sudah termasuk seluruh komponen gaji + ruang. Talent + bonus dihitung terpisah sebagai variable cost per project dan bisa ditagihkan ke klien.</p>
+    </div>
+  </div>
+
+  <!-- PAGE: EQUIPMENT -->
+  <div id="p-equipment" class="page">
+    <div class="section">
+      <div class="label">Investasi awal — setup studio standar</div>
+      <table>
+        <thead><tr><th style="width:30%">Item</th><th>Spesifikasi</th><th style="text-align:right">Harga</th></tr></thead>
+        <tbody>
+          <tr><td>iPhone 15 Pro (unit 1)</td><td class="td-muted"><span class="tag tag-teal">utama</span> 4K ProRes · sensor terbaik saat ini</td><td style="text-align:right">Rp 18.000.000</td></tr>
+          <tr><td>iPhone 14 Pro (unit 2)</td><td class="td-muted">Backup · angle ke-2 · atau pakai HP Kharisma/Ulfa dulu untuk hemat</td><td style="text-align:right">Rp 11.000.000</td></tr>
+          <tr><td>iPad Air M1</td><td class="td-muted">Review footage · CapCut/DaVinci · storyboard approval</td><td style="text-align:right">Rp 10.000.000</td></tr>
+          <tr><td>MacBook Air M2</td><td class="td-muted"><span class="tag tag-teal">AM/PM</span> Premiere · presentasi klien · export</td><td style="text-align:right">Rp 15.000.000</td></tr>
+          <tr><td>Laptop Admin</td><td class="td-muted">Advan / Axioo · spreadsheet · invoicing · ops</td><td style="text-align:right">Rp 6.000.000</td></tr>
+          <tr><td>Storage (enclosure + 2× 4TB HDD)</td><td class="td-muted">Orico 2-bay + WD Red · raw footage archive per project</td><td style="text-align:right">Rp 2.500.000</td></tr>
+          <tr><td>DJI Osmo Mobile 6</td><td class="td-muted">Gimbal HP · stabilisasi walking shot / lifestyle</td><td style="text-align:right">Rp 1.800.000</td></tr>
+          <tr><td>Lighting portable × 2</td><td class="td-muted">Godox LITEMONS bi-color · baterai built-in · lapangan + studio</td><td style="text-align:right">Rp 1.500.000</td></tr>
+          <tr><td>DJI Mic 2</td><td class="td-muted">Wireless clip-on · langsung ke HP · wajib talking head</td><td style="text-align:right">Rp 1.800.000</td></tr>
+          <tr><td>Props & dekorasi dasar</td><td class="td-muted">Backdrop, tanaman, meja props · beli bertahap</td><td style="text-align:right">Rp 2.000.000</td></tr>
+          <tr><td>Setup ruang</td><td class="td-muted">Deposit + meja + kursi + rak · coworking jika belum siap kontrakan</td><td style="text-align:right">Rp 5.000.000</td></tr>
+          <tr class="row-total"><td colspan="2">Total investasi awal (one-time)</td><td style="text-align:right">~Rp 74.600.000</td></tr>
+          <tr class="row-total"><td colspan="2">Versi hemat (skip unit ke-2 iPhone)</td><td style="text-align:right">~Rp 63.600.000</td></tr>
+        </tbody>
+      </table>
+      <p class="note">Tidak termasuk: lisensi software bulanan (Adobe ~Rp400k/bln, CapCut Pro ~Rp100k, total ~Rp600k/bln). Sewa kamera bisa tetap on-call untuk brief yang butuh lebih dari HP.</p>
+    </div>
+  </div>
+
+  <!-- PAGE: FLOW -->
+  <div id="p-flow" class="page">
+    <div class="section">
+      <div class="label">Alur produksi — approval before take (wajib SOP)</div>
+      <div class="flow">
+        <div class="flow-box accent">Brief masuk dari brand</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box accent">Eka bedah frame by frame</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box accent">Storyboard + shot list</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box warn">Brand APPROVE</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">Talent booking + props</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">Shoot hari H</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">Edit + deliver</div>
+      </div>
+      <table style="margin-top:16px">
+        <thead><tr><th>Tahap</th><th>Waktu ideal</th><th>Yang bisa bikin molor</th></tr></thead>
+        <tbody>
+          <tr><td>Brief → storyboard</td><td style="color:var(--color-text-secondary)">1–2 hari kerja</td><td class="td-muted">Brief tidak lengkap, AM harus bolak-balik klarifikasi</td></tr>
+          <tr><td>Approval brand</td><td style="color:var(--color-text-secondary)">1–2 hari kerja</td><td class="td-muted">Internal review brand lambat — harus ada SLA di kontrak (maks 48 jam)</td></tr>
+          <tr><td>Persiapan + talent booking</td><td style="color:var(--color-text-secondary)">1 hari</td><td class="td-muted">Talent tidak available, props butuh beli dulu</td></tr>
+          <tr><td>Shoot</td><td style="color:var(--color-text-secondary)">½–1 hari</td><td class="td-muted">Lokasi tidak sesuai brief, talent tidak siap — dicegah dengan approval ketat</td></tr>
+          <tr><td>Edit + deliver</td><td style="color:var(--color-text-secondary)">½–1 hari per konten</td><td class="td-muted">Revisi karena brief berubah pasca-shoot — ini yang bikin double cost</td></tr>
+          <tr class="row-total"><td colspan="2">Total ideal 1 brief → deliver</td><td>4–6 hari kerja</td></tr>
+        </tbody>
+      </table>
+      <p class="note">Klausul kontrak: (1) revisi post-shoot karena brief tidak sesuai = biaya tambahan. (2) Approval brand maks 48 jam — lewat dari itu studio tidak bertanggung jawab atas delay. (3) Re-take karena brand ubah konsep = dihitung project baru.</p>
+    </div>
+  </div>
+
+  <!-- PAGE: TIMELINE -->
+  <div id="p-timeline" class="page">
+    <div class="section">
+      <div class="label">Timeline setup → siap produksi (4 minggu)</div>
+      <div class="timeline">
+        <div class="tl-step">
+          <div class="tl-week">Minggu 1</div>
+          <div class="tl-title">Legal + Space</div>
+          <div class="tl-items">Finalisasi kontrak investor · cari kontrakan/ruko · tanda tangan NDA Eka & Adil · bikin entity (CV/PT)</div>
+        </div>
+        <div class="tl-step">
+          <div class="tl-week">Minggu 2</div>
+          <div class="tl-title">Procurement</div>
+          <div class="tl-items">Beli gadget (iPhone, MacBook, iPad, storage) · DJI Mic · gimbal · lighting · setup ruang minimal</div>
+        </div>
+        <div class="tl-step">
+          <div class="tl-week">Minggu 3</div>
+          <div class="tl-title">SOP + Flow test</div>
+          <div class="tl-items">Test shoot internal · bedah brief dummy · approval loop simulation · setting folder & drive struktur</div>
+        </div>
+        <div class="tl-step">
+          <div class="tl-week">Minggu 4</div>
+          <div class="tl-title">Siap terima brief</div>
+          <div class="tl-items">Studio ready · Eka brief Jakarta agency · onboard talent pool pertama (3–5 profil) · first project masuk</div>
+        </div>
+      </div>
+    </div>
+    <hr>
+    <div class="section">
+      <div class="label">Checklist kesiapan per minggu</div>
+      <div id="checklist"></div>
+    </div>
+  </div>
+
+  <!-- PAGE: INVESTOR -->
+  <div id="p-investor" class="page">
+    <div class="section">
+      <div class="label">Angka yang dibawa ke investor</div>
+      <div class="metric-row">
+        <div class="metric"><div class="metric-l">Investasi awal</div><div class="metric-v">Rp 75 jt</div></div>
+        <div class="metric"><div class="metric-l">Opex bulanan</div><div class="metric-v">Rp 20 jt</div></div>
+        <div class="metric"><div class="metric-l">Kapasitas launch</div><div class="metric-v">60–100/bln</div></div>
+        <div class="metric"><div class="metric-l">Cost/konten target</div><div class="metric-v">Rp 200–300rb</div></div>
+        <div class="metric"><div class="metric-l">Waktu setup</div><div class="metric-v">4 minggu</div></div>
+        <div class="metric"><div class="metric-l">Benchmark Jakarta</div><div class="metric-v">Rp 250rb</div></div>
+      </div>
+    </div>
+    <hr>
+    <div class="section">
+      <div class="label">Proyeksi BEP sederhana</div>
+      <div style="position:relative;height:260px;margin-bottom:1rem">
+        <canvas id="bep-chart" role="img" aria-label="Break-even chart showing monthly revenue vs fixed cost at different production volumes"></canvas>
+      </div>
+      <p class="note">Proyeksi asumsi harga jual Rp250rb/konten, fixed cost Rp20jt/bln. BEP tercapai di 80 konten/bulan.</p>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script>
+    function go(id, btn) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+      document.getElementById('p-' + id).classList.add('active');
+      if (btn) btn.classList.add('active');
+      if (id === 'calc') initCalc();
+      if (id === 'investor') initBEP();
+      if (id === 'timeline') initChecklist();
+    }
+
+    function fmt(n) { return 'Rp ' + Math.round(n).toLocaleString('id-ID'); }
+
+    let calcChart;
+    function initCalc() {
+      const vol = parseInt(document.getElementById('vol').value);
+      const fixed = parseInt(document.getElementById('model-sel').value);
+      const price = parseInt(document.getElementById('price').value);
+      updateCalc(vol, fixed, price);
+    }
+
+    function updateCalc(vol, fixed, price) {
+      const cpp = fixed / vol;
+      const margin = price - cpp;
+      const revenue = price * vol;
+      const profit = revenue - fixed;
+      const BENCH = 250000;
+      document.getElementById('vol-out').textContent = vol;
+      document.getElementById('price-out').textContent = fmt(price);
+      document.getElementById('calc-cards').innerHTML = `
+        <div class="metric"><div class="metric-l">Biaya per konten</div><div class="metric-v" style="font-size:16px;color:${cpp>price?'#A32D2D':'#0F6E56'}">${fmt(cpp)}</div></div>
+        <div class="metric"><div class="metric-l">Revenue/bulan</div><div class="metric-v" style="font-size:16px">${fmt(revenue)}</div></div>
+        <div class="metric"><div class="metric-l">Profit/bulan</div><div class="metric-v" style="font-size:16px;color:${profit>=0?'#0F6E56':'#A32D2D'}">${profit>=0?'+':''}${fmt(profit)}</div></div>
+        <div class="metric"><div class="metric-l">Margin vs benchmark</div><div class="metric-v" style="font-size:16px;color:${cpp<=BENCH?'#0F6E56':'#A32D2D'}">${cpp<=BENCH?'Lebih murah':'Lebih mahal'}</div></div>
+      `;
+      let cls, msg;
+      if (cpp < 150000) {
+        cls='be-good';
+        msg=`Di ${vol} konten/bln, biaya per konten jauh di bawah benchmark. ROI investor jelas.`;
+      } else if (cpp <= price) {
+        cls='be-ok';
+        msg=`Di ${vol} konten/bln, masih kompetitif — margin positif tapi tipis. Naikkan volume atau harga jual.`;
+      } else {
+        cls='be-bad';
+        msg=`Di ${vol} konten/bln, biaya per konten (${fmt(cpp)}) masih di atas harga jual. Perlu tambah volume atau potong fixed cost.`;
+      }
+      document.getElementById('calc-verdict').innerHTML = `<div class="be-row ${cls}">${msg}</div>`;
+
+      const data = {
+        labels: ['Biaya/konten','Harga jual','Benchmark Jakarta'],
+        datasets: [{
+          data: [Math.round(cpp), price, 250000],
+          backgroundColor: ['#378ADD','#1D9E75','#EF9F27'],
+          borderRadius: 4
+        }]
+      };
+
+      if (calcChart) {
+        calcChart.data.datasets[0].data = [Math.round(cpp), price, 250000];
+        calcChart.update();
+        return;
+      }
+
+      calcChart = new Chart(document.getElementById('calc-chart'), {
+        type: 'bar',
+        data,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { callback: v => 'Rp'+Math.round(v/1000)+'rb' }
+            }
+          }
+        }
+      });
+    }
+
+    document.getElementById('vol').addEventListener('input', () => {
+      updateCalc(
+        parseInt(document.getElementById('vol').value),
+        parseInt(document.getElementById('model-sel').value),
+        parseInt(document.getElementById('price').value)
+      );
+    });
+
+    document.getElementById('price').addEventListener('input', () => {
+      updateCalc(
+        parseInt(document.getElementById('vol').value),
+        parseInt(document.getElementById('model-sel').value),
+        parseInt(document.getElementById('price').value)
+      );
+    });
+
+    document.getElementById('model-sel').addEventListener('change', () => {
+      updateCalc(
+        parseInt(document.getElementById('vol').value),
+        parseInt(document.getElementById('model-sel').value),
+        parseInt(document.getElementById('price').value)
+      );
+    });
+
+    let bepChart;
+    function initBEP() {
+      if (bepChart) return;
+      const vols = [20,40,60,80,100,120,140];
+      const revenue = vols.map(v => v * 250000);
+      const cost = vols.map(() => 20000000);
+
+      bepChart = new Chart(document.getElementById('bep-chart'), {
+        type: 'line',
+        data: {
+          labels: vols.map(v => v+' konten'),
+          datasets: [
+            {
+              label: 'Revenue',
+              data: revenue,
+              borderColor: '#1D9E75',
+              backgroundColor: 'rgba(29,158,117,0.1)',
+              fill: true,
+              tension: 0.3
+            },
+            {
+              label: 'Fixed cost',
+              data: cost,
+              borderColor: '#E24B4A',
+              borderDash: [5,5],
+              backgroundColor: 'transparent',
+              tension: 0
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: {
+              ticks: { callback: v => 'Rp'+Math.round(v/1000000)+'jt' }
+            }
+          }
+        }
+      });
+    }
+
+    let checklistInitialized = false;
+    function initChecklist() {
+      if (checklistInitialized) return;
+      const items = [
+        { week: 'Minggu 1', tasks: ['Finalisasi kontrak investor','Cari kontrakan / ruko Jogja','Tanda tangan NDA Eka & Adil','Bikin entity (CV atau PT)'] },
+        { week: 'Minggu 2', tasks: ['Beli iPhone 15 Pro','Beli MacBook Air M2','Beli iPad Air M1','DJI Mic 2 + gimbal + lighting','Setup ruang minimal'] },
+        { week: 'Minggu 3', tasks: ['Test shoot internal','Bedah brief dummy','Approval loop simulation','Setting folder & drive struktur'] },
+        { week: 'Minggu 4', tasks: ['Studio ready','Eka brief Jakarta agency','Onboard talent pool pertama (3–5 profil)','First project masuk'] }
+      ];
+
+      const el = document.getElementById('checklist');
+      el.innerHTML = items.map((wk,wi) => `
+        <div style="margin-bottom:16px">
+          <div class="label" style="margin-bottom:8px">${wk.week}</div>
+          ${wk.tasks.map((t,ti) => `
+            <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:0.5px solid var(--color-border-tertiary);cursor:pointer;font-size:13px">
+              <input type="checkbox" id="chk-${wi}-${ti}" style="width:15px;height:15px;cursor:pointer">
+              <span id="chk-lbl-${wi}-${ti}">${t}</span>
+            </label>
+          `).join('')}
+        </div>
+      `).join('');
+
+      el.querySelectorAll('input[type=checkbox]').forEach(cb => {
+        cb.addEventListener('change', function() {
+          const lbl = document.getElementById(this.id.replace('chk-','chk-lbl-'));
+          lbl.style.textDecoration = this.checked ? 'line-through' : 'none';
+          lbl.style.color = this.checked ? 'var(--color-text-tertiary)' : 'var(--color-text-primary)';
+        });
+      });
+
+      checklistInitialized = true;
+    }
+
+    initCalc();
+  </script>
+</body>
+</html>
